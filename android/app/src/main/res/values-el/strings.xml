@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Greek strings for the native Android shell (the WebView panel has its own dictionary). -->
+    <string name="pair_title">Σύζευξη με υπολογιστή;</string>
+    <string name="pair_message">\"%1$s\" στη διεύθυνση %2$s (θύρα %3$d).\n\nΕλέγξτε ότι το παράθυρο σύζευξης του υπολογιστή εμφανίζει τον κωδικό %4$s.\n\nΣυνεχίστε μόνο αν εσείς ξεκινήσατε τη σύζευξη σε αυτόν τον υπολογιστή.</string>
+    <string name="pair_positive">Σύζευξη</string>
+    <string name="pair_negative">Άκυρο</string>
+    <string name="pair_progress">Σύζευξη με %1$s…</string>
+    <string name="pair_done">Έγινε σύζευξη με %1$s</string>
+    <string name="pair_failed_title">Η σύζευξη απέτυχε</string>
+    <!-- %1$s is the computer's name, %2$s its addresses. -->
+    <string name="pair_failed_unreachable">Δεν ήταν δυνατή η σύνδεση με τον %1$s στη διεύθυνση %2$s. Το τηλέφωνο και ο υπολογιστής πρέπει να βρίσκονται στο ίδιο δίκτυο (ή και τα δύο στο Tailscale) και το τείχος προστασίας του υπολογιστή πρέπει να επιτρέπει το PhoneBox.</string>
+    <string name="pair_failed_code">Ο %1$s δεν αποδέχτηκε τον κωδικό: ισχύει μία φορά και για 5 λεπτά. Ξεκινήστε ξανά τη σύζευξη στον υπολογιστή.</string>
+    <string name="pair_failed_answer">Ο %1$s απάντησε %2$d.</string>
+    <string name="pair_failed_certificate">Ο υπολογιστής έχει διαφορετικό πιστοποιητικό από τον κωδικό QR. Ξεκινήστε ξανά τη σύζευξη.</string>
+    <string name="ok">OK</string>
+</resources>

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>PhoneBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="controls.css">
+<link rel="stylesheet" href="appearance.css">
+</head>
+<body>
+<!-- Pages and widgets are built by main.js and widgets/*.js from the layout designed in the agent's settings page. -->
+<div id="pager"></div>
+
+<nav id="dots" data-i18n-title="panel.allPages" title="All pages"></nav>
+<div id="ptitle"></div>
+<div id="pagePauseOverlay" aria-hidden="true"></div>
+
+<div id="overview" hidden>
+  <div class="ov-head"><span data-i18n="panel.allPages">All pages</span> <small data-i18n="panel.overviewHint">tap one to jump · volume keys flip pages · long-press a page to come back here</small><span id="ovPcs"></span><button class="ov-pc" id="ovRules" hidden></button></div>
+  <div id="ovGrid"></div>
+</div>
+
+<div class="p-sheet" id="pSheet" hidden>
+  <div class="ps-head">
+    <div class="p-ico" id="psIco"></div>
+    <div class="ps-title"><b id="psTitle"></b><small id="psSub"></small></div>
+    <button class="ps-btn danger" id="psAll" data-i18n="panel.endAll">End all</button>
+    <button class="ps-btn" id="psClose" data-i18n-aria="panel.close" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="ps-list" id="psList"></div>
+</div>
+
+<div id="approval" hidden>
+  <div class="ap-card">
+    <div class="ap-head"><span class="ap-logo" id="apLogo" aria-hidden="true">◆</span><span id="apSource">AI agent</span><span class="ap-count" id="apCount"></span></div>
+    <div class="ap-context"><b id="apProject"></b><span class="ap-sep" id="apContextSep">·</span><code id="apCwd"></code></div>
+    <div class="ap-tool" id="apTool"></div>
+    <div class="ap-desc" id="apDesc"></div>
+    <pre class="ap-detail" id="apDetail"></pre>
+    <div class="ap-pattern" id="apPattern" hidden></div>
+    <div class="ap-choices" id="apChoices" hidden></div>
+    <div class="ap-custom" id="apCustom" hidden>
+      <input type="text" id="apCustomText" autocomplete="off" spellcheck="false" enterkeyhint="send">
+      <button class="ap-btn allow" id="apCustomSend" data-i18n="panel.answerSend">Send</button>
+    </div>
+    <div class="ap-foot">
+      <span class="ap-time" id="apTime"></span>
+      <button class="ap-btn deny" id="apDeny" data-i18n="panel.deny">Deny</button>
+      <button class="ap-btn always" id="apAlways" hidden data-i18n="panel.allowAlways">Always allow</button>
+      <button class="ap-btn allow" id="apAllow" data-i18n="panel.allow">Allow</button>
+      <button class="ap-btn allow" id="apSkip" hidden data-i18n="panel.gotIt">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- calm page switching: countdown before a rule (or the idle return) changes the page, and a chip while it waits -->
+<div id="navCard" role="status">
+  <div class="nv-ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle id="nvRing" cx="22" cy="22" r="19" pathLength="100"/></svg><b id="nvNum">3</b></div>
+  <div class="nv-text"><b id="nvName"></b><span id="nvLine"></span><small id="nvDetail"></small></div>
+  <button class="nv-btn" id="nvStay" data-i18n="panel.stay">Stay</button>
+  <button class="nv-btn go" id="nvGo" data-i18n="panel.goNow">Go now</button>
+</div>
+<div id="navChip"><button id="ncGo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg><b id="ncText"></b><small id="ncWhy"></small></button><button id="ncX" data-i18n-aria="panel.dismiss" aria-label="Dismiss"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+
+<div class="toast" id="toast"></div>
+<div id="offline"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 16.5a5 5 0 0 1 7 0M2 8.82a15 15 0 0 1 4.17-2.65M10.66 5c4.01-.36 8.14.9 11.34 3.76M16.85 11.25a10 10 0 0 1 2.22 1.68M5 13a10 10 0 0 1 5.24-2.76M12 20h.01M2 2l20 20"/></svg><span data-i18n="panel.pcNotConnected">PC not connected</span></div>
+<div id="wake" hidden><button type="button" data-i18n="panel.wake">Wake the PC</button><span class="note" role="status"></span></div>
+<div id="night"><div id="nClock">--:--</div><div id="nDate"></div></div>
+
+<div id="webviewWarn" hidden role="status" style="position:fixed;top:8px;left:8px;right:8px;z-index:90;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(24,20,12,.94);border:1px solid rgba(245,158,11,.45);color:#fde68a;font:12.5px/1.35 system-ui,sans-serif">
+  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+  <span style="flex:1" data-i18n="panel.webviewWarn">Outdated WebView — update Android System WebView or Google Chrome so widgets scale properly.</span>
+  <button id="webviewWarnClose" type="button" data-i18n-aria="panel.dismissWebview" aria-label="Dismiss WebView notice" style="background:transparent;border:1px solid rgba(253,230,138,.35);color:inherit;border-radius:6px;padding:3px 8px;font:inherit;cursor:pointer;display:flex"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+</div>
+<script>
+(function () {
+  try {
+    if (/[?&]preview(?:[=&]|$)/.test(location.search)) return;
+    var el = document.getElementById('webviewWarn'), btn = document.getElementById('webviewWarnClose');
+    if (!el) return;
+    // A WebView older than Chromium 80 can't run the panel at all (modules, ?. and ??): the stock WebView of Android 5
+    // and 6 until it is updated. The panel would stay black, so say what to do, in English as the translations come
+    // with the code it can't run, and keep it up: there is nothing behind it.
+    var runs = 'noModule' in document.createElement('script');
+    try { new Function('return ({ a: 1 })?.a ?? 1_0'); } catch (_) { runs = false; }
+    if (!runs) {
+      var text = el.querySelector('span');
+      if (text) {
+        text.removeAttribute('data-i18n');
+        text.textContent = 'This Android System WebView is too old to run the panel. Update Android System WebView or '
+          + 'Google Chrome from Google Play (version 80 or later), then open PhoneBox again.';
+      }
+      if (btn) btn.style.display = 'none';
+      el.hidden = false; el.style.display = 'flex';
+      window.__pbTooOld = true;
+      return;
+    }
+    if (window.CSS && typeof CSS.supports === 'function' && CSS.supports('font-size', '1cqw')) return;
+    try { if (sessionStorage.getItem('pb-wv-dismissed') === '1') return; } catch (_) {}
+    el.hidden = false; el.style.display = 'flex';
+    if (btn) btn.onclick = function (e) {
+      e.stopPropagation();
+      el.style.display = ''; el.hidden = true;
+      try { sessionStorage.setItem('pb-wv-dismissed', '1'); } catch (_) {}
+    };
+  } catch (_) {}
+})();
+</script>
+<div id="jsfail" hidden role="alert" style="position:fixed;left:8px;right:8px;bottom:8px;z-index:200;padding:10px 12px;border-radius:10px;background:rgba(60,10,10,.96);border:1px solid rgba(248,113,113,.6);color:#fecaca;font:12px/1.4 monospace;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow:auto"></div>
+<script>
+// Anything that throws while the panel boots leaves a black screen with no clue. Show it instead.
+(function () {
+  var box = document.getElementById('jsfail'), lines = [];
+  window.__pbFail = function (text) {
+    // the WebView notice already says what is wrong; its syntax errors would only bury it
+    if (window.__pbTooOld || lines.indexOf(text) >= 0) return;
+    lines.push(text);
+    if (!box) return;
+    box.hidden = false; box.style.display = 'block';
+    box.textContent = lines.join('\n');
+  };
+  // A warning that stays after the thing recovered is worse than none: it teaches the reader to ignore the box.
+  window.__pbClear = function (prefix) {
+    var keep = [];
+    for (var i = 0; i < lines.length; i++) if (lines[i].indexOf(prefix) !== 0) keep.push(lines[i]);
+    if (keep.length === lines.length) return;
+    lines = keep;
+    if (!box) return;
+    box.textContent = lines.join('\n');
+    if (!lines.length) { box.hidden = true; box.style.display = 'none'; }
+  };
+  window.addEventListener('error', function (e) {
+    var t = e && e.target;
+    if (t && t !== window && (t.src || t.href)) {
+      // only the panel's own code and styles: a cover, photo, icon or stream that fails is the widget's to handle
+      // (a media session that ended while its cover loaded answers 404), and it would stay here for good (#200)
+      var tag = String(t.tagName || '').toUpperCase();
+      if (tag === 'SCRIPT' || tag === 'LINK') window.__pbFail('LOAD FAIL ' + (t.src || t.href));
+      return;
+    }
+    if (e && e.message) window.__pbFail('ERR ' + e.message + (e.filename ? '  ' + String(e.filename).split('/').pop() + ':' + e.lineno : ''));
+  }, true);
+  // a tap puts the box away (it comes back with the next new problem)
+  if (box) box.addEventListener('click', function () { lines = []; box.hidden = true; box.style.display = 'none'; });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e && e.reason;
+    window.__pbFail('REJECT ' + ((r && (r.stack || r.message)) || String(r)));
+  });
+  // main.js sets __pbUp at the end of its boot: a panel that rendered nothing by now never got there.
+  // A slow module graph can still arrive after this fires. The flag turning true means the message is stale, so
+  // take it back instead of leaving a working panel reporting a failure for the rest of the session.
+  setTimeout(function () {
+    if (window.__pbUp || window.__pbTooOld) return;
+    window.__pbFail('the panel did not finish booting in 8s\nUA: ' + navigator.userAgent);
+    var watch = setInterval(function () {
+      if (!window.__pbUp) return;
+      clearInterval(watch);
+      window.__pbClear('the panel did not finish booting');
+    }, 500);
+  }, 8000);
+})();
+</script>
+<script src="compat.js"></script>
+<script src="i18n.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
